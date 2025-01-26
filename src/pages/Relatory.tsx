@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input"
 
 function CardRelatory({ title, value }: { title: string, value: number }) {
     return (
-        <div className="border border-gray-200">
-            <h1>{title}</h1>
+        <div className="border border-gray-200 p-4 rounded">
+            <h1 className="font-bold">{title}</h1>
             <span>{value}</span>
         </div>
     )
@@ -23,8 +23,7 @@ function CardRelatory({ title, value }: { title: string, value: number }) {
 export default function Relatory() {
     const chartData = [
         { month: "January", andamento: 400, pendente: 186, concluido: 80, cancelado: 20 },
-        { month: "January2", andamento: 400, pendente: 186, concluido: 80, cancelado: 20 },
-        { month: "January3", andamento: 400, pendente: 186, concluido: 80, cancelado: 20 },
+
     ]
 
     const chartConfig = {
@@ -58,25 +57,28 @@ export default function Relatory() {
                         <Button>Filtrar</Button>
                     </PopoverTrigger>
                     <PopoverContent>
-                        <div>
-                            <Label>Mês inicio</Label>
-                            <Input type="date" />
+                        <div className="flex flex-col gap-4">
+
+                            <div>
+                                <Label>Mês inicio</Label>
+                                <Input type="date" />
+                            </div>
+                            <div>
+                                <Label>Mês fim</Label>
+                                <Input type="date" />
+                            </div>
+                            <Button>Definir filtro</Button>
                         </div>
-                        <div>
-                            <Label>Mês fim</Label>
-                            <Input type="date" />
-                        </div>
-                        <Button>Definir filtro</Button>
                     </PopoverContent>
                 </Popover>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center gap-4">
                 <span>Dados referente a todo o periodo selecionado</span>
-                <div className="flex gap-4 self-center">
+                <div className="flex gap-4">
                     <CardRelatory title="Total de compromissos em andamento" value={100} />
                     <CardRelatory title="Total de compromissos pendentes" value={20} />
-                    <CardRelatory title="Total de compromissos concluídos" value={80} />
                     <CardRelatory title="Total de compromissos cancelados" value={20} />
+                    <CardRelatory title="Total de compromissos concluídos" value={80} />
                 </div>
             </div>
             <div>

@@ -7,10 +7,19 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
+import { Eye, Pencil } from "lucide-react"
 import CalendaryCreate from "@/pages/Calendary/CalendaryCreate"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState } from "react"
 
 export default function Calendary() {
+    const [editModal, setEditModal] = useState<boolean>(false)
+
+    function handleEditCrompromisse(item) {
+        console.log(item)
+        setEditModal(true)
+    }
+
     return (
         <section className="flex flex-col w-full gap-4">
             <div>
@@ -18,6 +27,14 @@ export default function Calendary() {
                 <p>Organize sua rotina! Aqui você pode visualizar todos os seus compromissos e criar novas tarefas para manter seu dia sempre em ordem.</p>
             </div>
             <CalendaryCreate />
+            <Dialog open={editModal} onOpenChange={setEditModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Novo compromisso</DialogTitle>
+                    </DialogHeader>
+                    <CalendaryCreate />
+                </DialogContent>
+            </Dialog>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -25,6 +42,7 @@ export default function Calendary() {
                         <TableHead>Descrição</TableHead>
                         <TableHead>Data</TableHead>
                         <TableHead>Hora</TableHead>
+                        <TableHead>Categorias</TableHead>
                         <TableHead></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -35,7 +53,9 @@ export default function Calendary() {
                         <TableCell>Credit Card</TableCell>
                         <TableCell>$250.00</TableCell>
                         <TableCell className="text-right">
-                            <Button><Eye />Visualizar</Button>
+                            <Button onClick={() => handleEditCrompromisse("ds")}>
+                                <Pencil />Abrir
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>

@@ -6,196 +6,221 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@radix-ui/react-label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
+import { taskStatus } from "@/data/enum"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Trash2 } from "lucide-react"
+
+const CalendaryCreateContext = React.createContext(null)
 
 function CalendaryTasks() {
-    return (
-        <Dialog>
-            <DialogTrigger>
-                <Button>Atividades</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Atividades</DialogTitle>
-                    <DialogDescription>Preencha os dados para cadastrar atividades</DialogDescription>
-                </DialogHeader>
-                <div>
-                    <Label>Descrição</Label>
-                    <Input />
-                </div>
-                <div>
-                    <Label>Status</Label>
-                    <Select>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Theme" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <Button>Cadastrar</Button>
-                </div>
-                <div>
-                    <Label>Atividades cadastradas</Label>
-                    <ScrollArea className="h-40 border-gray-200 border rounded">
-                        <div className=" flex flex-col">
-                            <span className="p-2">teste</span>
-                            <span className="p-2">teste</span>
-                            <span className="p-2">teste</span>
+    const [description, setDescription] = React.useState<string>("")
+    const [status, setStatus] = React.useState<number>(0)
+    const { tasks, setTasks } = React.useContext(CalendaryCreateContext)
 
-                        </div>
-                    </ScrollArea>
-                </div>
-            </DialogContent>
-        </Dialog>
+    const handleRemoveTasks = (index) => {
+        setTasks(tasks.filter((_, i) => i !== index))
+    }
+
+    const handleAddTasks = () => {
+        setTasks([...tasks, { descricao: description, status: status }])
+    }
+
+    console.log(tasks)
+
+    return (
+        <div className="flex flex-col gap-4">
+            <div>
+                <Label htmlFor="taskDescription">Descrição</Label>
+                <Input id="taskDescription" onChange={e => setDescription(e.target.value)} />
+            </div>
+            <div>
+                <Label htmlFor="taskStatus">Status</Label>
+                <Select onValueChange={e => setStatus(e)} value={status}>
+                    <SelectTrigger id="taskStatus">
+                        <SelectValue placeholder="Selecione o status da tarefa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value={taskStatus["Andamento"]}>Andamento</SelectItem>
+                        <SelectItem value={taskStatus["Pendente"]}>Pendente</SelectItem>
+                        <SelectItem value={taskStatus["Cancelado"]}>Cancelado</SelectItem>
+                        <SelectItem value={taskStatus["Concluido"]}>Concluido</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div>
+                <Button onClick={handleAddTasks}>Cadastrar tarefas</Button>
+            </div>
+            <div>
+                <Label>Atividades cadastradas</Label>
+                <ScrollArea className="h-40 border-gray-200 border rounded">
+                    <Table>
+                        <TableHeader>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Ação</TableHead>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                tasks.map((task, index) => (
+                                    <TableRow>
+                                        <TableCell>{task.descricao}</TableCell>
+                                        <TableCell>{taskStatus[task.status]}</TableCell>
+                                        <TableCell>
+                                            <Trash2 className="w-5 cursor-pointer" onClick={() => handleRemoveTasks(index)} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+
+                        </TableBody>
+                    </Table>
+                </ScrollArea>
+            </div>
+        </div >
     )
 }
 
+type Checked = DropdownMenuCheckboxItemProps["checked"]
 function CalendaryCategory() {
-    const frameworks = [
-        {
-            value: "next.js",
-            label: "Next.js",
-        },
-        {
-            value: "sveltekit",
-            label: "SvelteKit",
-        },
-        {
-            value: "nuxt.js",
-            label: "Nuxt.js",
-        },
-        {
-            value: "remix",
-            label: "Remix",
-        },
-        {
-            value: "astro",
-            label: "Astro",
-        },
-    ]
+    const { categorias, setCategorias } = React.useContext(CalendaryCreateContext)
 
-    const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
+    const handleCheckedChange = (id: string, checked: boolean) => {
+        setCategorias((prevState) =>
+            prevState.map((category) =>
+                category.id === id ? { ...category, checked } : category
+            )
+        );
+    };
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                >
-                    {value
-                        ? frameworks.find((framework) => framework.value === value)?.label
-                        : "Select framework..."}
-                    <ChevronsUpDown className="opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-                <Command>
-                    <CommandInput placeholder="Search framework..." />
-                    <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
-                        <CommandGroup>
-                            {frameworks.map((framework) => (
-                                <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
-                                    onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
-                                    }}
-                                >
-                                    {framework.label}
-                                    <Check
-                                        className={cn(
-                                            "ml-auto",
-                                            value === framework.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button>Categoria</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>Categorias</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {categorias.map((category) => (
+                    <DropdownMenuCheckboxItem
+                        key={category.id}
+                        checked={category.checked}
+                        onCheckedChange={(checked) => handleCheckedChange(category.id, checked)}
+                    >
+                        {category.name}
+                    </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
+
+function CalendaryCompromisse() {
+    const { nome, setNome, descricao, setDescricao, data, setData, hora, setHora } = React.useContext(CalendaryCreateContext)
+
+    return (
+        <div className="flex flex-col gap-4">
+            <div>
+                <Label htmlFor="nome">Nome</Label>
+                <Input id="nome" onChange={e => setNome(e.target.value)} value={nome} />
+            </div>
+            <div>
+                <Label htmlFor="descricao">Descrição</Label>
+                <Textarea id="descricao" onChange={e => setDescricao(e.target.value)} value={descricao} />
+            </div>
+            <div className="flex w-full gap-4">
+                <div className="w-full">
+                    <Label htmlFor="data">Data</Label>
+                    <Input type="date" id="data" onChange={e => setData(e.target.value)} value={data} />
+                </div>
+                <div className="w-full">
+                    <Label htmlFor="hora">Hora</Label>
+                    <Input type="time" id="hora" onChange={e => setHora(e.target.value)} value={hora} />
+                </div>
+            </div>
+            <div className="flex gap-4 items-center">
+                <CalendaryCategory />
+                <Label>Deseja cadastrar categorias?</Label>
+            </div>
+        </div>
+    )
+}
+
 
 export default function CalendaryCreate() {
+    const categoriasList = [
+        { id: "1", name: "Status Bar", checked: true },
+        { id: "2", name: "Activity Bar", checked: false },
+        { id: "3", name: "Panel", checked: false },
+    ];
+
+
+    const [nome, setNome] = React.useState<string>("")
+    const [descricao, setDescricao] = React.useState<string>("")
+    const [data, setData] = React.useState<string>("")
+    const [hora, setHora] = React.useState<string>("")
+    const [categorias, setCategorias] = React.useState<object[]>(categoriasList)
+    const [tasks, setTasks] = React.useState<object[]>([])
+
     return (
-        <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button>Cadastrar</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Cadastro de compromisso</DialogTitle>
-                        <DialogDescription>
-                            Preencha as informações abaixo para cadastrar um novo compromisso
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div>
-                        <Label>Nome</Label>
-                        <Input />
-                    </div>
-                    <div>
-                        <Label>Categoria</Label>
-                        <CalendaryCategory />
-                    </div>
-                    <div>
-                        <Label>Descrição</Label>
-                        <Textarea />
-                    </div>
-                    <div className="flex w-full gap-4">
-                        <div className="w-full">
-                            <Label>Data</Label>
-                            <Input type="date" />
-                        </div>
-                        <div className="w-full">
-                            <Label>Hora</Label>
-                            <Input type="time" />
-                        </div>
-                    </div>
-                    <div className="flex gap-4 items-center">
-                        <CalendaryTasks />
-                        <Label>Deseja cadastrar atividades?</Label>
-                    </div>
-                    <Button>Cadastrar</Button>
-                </DialogContent>
-            </Dialog>
-        </div>
+        <CalendaryCreateContext.Provider value={{
+            tasks,
+            setTasks,
+            nome,
+            setNome,
+            descricao,
+            setDescricao,
+            data,
+            setData,
+            hora,
+            setHora,
+            categorias,
+            setCategorias
+        }}>
+            <div>
+                <Dialog>
+                    <DialogTrigger>
+                        <Button>Cadastrar</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Cadastro de compromisso</DialogTitle>
+                            <DialogDescription>
+                                Preencha as informações abaixo para cadastrar um novo compromisso
+                            </DialogDescription>
+                        </DialogHeader>
+                        <Tabs defaultValue="compromisse" className="w-full">
+                            <TabsList className="w-full">
+                                <TabsTrigger value="compromisse" className="w-full">Compromissos</TabsTrigger>
+                                <TabsTrigger value="tasks" className="w-full">Tarefas</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="compromisse" >
+                                <CalendaryCompromisse />
+                            </TabsContent>
+                            <TabsContent value="tasks">
+                                <CalendaryTasks />
+                            </TabsContent>
+                        </Tabs>
+                        <Button>Cadastrar compromisso</Button>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </CalendaryCreateContext.Provider>
     )
 }

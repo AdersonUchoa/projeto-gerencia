@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye } from "lucide-react";
 import {
@@ -13,12 +12,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import React from "react";
 
 function NotificationReadAll() {
     return (
         <AlertDialog>
             <AlertDialogTrigger>
-                <Button>Marcar todas como lidas</Button>
+                <Button><Eye /> Marcar todas como lidas</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
@@ -37,6 +37,13 @@ function NotificationReadAll() {
 }
 
 export default function Notification() {
+
+    const [readModal, setReadModal] = React.useState<boolean>(false)
+    const [readNotification, setReadNotification] = React.useState<boolean>(false)
+    function handleRead(item) {
+        setReadModal(true)
+    }
+
     return (
         <section className="flex flex-col w-full gap-4">
             <div>
@@ -44,9 +51,22 @@ export default function Notification() {
                 <p>Veja todas as notificação</p>
             </div>
             <div>
-
                 <NotificationReadAll />
             </div>
+            <AlertDialog open={readModal} onOpenChange={setReadModal}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Essa ação irá marcar essa notificação como lida.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <Table>
                 <TableCaption>Lista de compromissos</TableCaption>
                 <TableHeader>
@@ -54,6 +74,7 @@ export default function Notification() {
                         <TableHead className="w-[100px]">Nome</TableHead>
                         <TableHead>Descrição</TableHead>
                         <TableHead>Data e hora</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -62,8 +83,11 @@ export default function Notification() {
                         <TableCell className="font-medium">INV001</TableCell>
                         <TableCell>Paid</TableCell>
                         <TableCell>Credit Card</TableCell>
+                        <TableCell>Lida</TableCell>
                         <TableCell className="text-right">
-                            <Button><Eye />Marcar como lida</Button>
+                            <Button onClick={() => handleRead("item")}>
+                                <Eye /> Marcar como lida
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
