@@ -80,9 +80,9 @@ export default function Notification() {
                 </TableHeader>
                 <TableBody>
                     <TableRow>
-                        <TableCell className="font-medium">INV001</TableCell>
-                        <TableCell>Paid</TableCell>
-                        <TableCell>Credit Card</TableCell>
+                        <TableCell className="font-medium">Pagamento fatura</TableCell>
+                        <TableCell>Pagar fatura do cartão</TableCell>
+                        <TableCell>27/01/2025 12:50</TableCell>
                         <TableCell>Lida</TableCell>
                         <TableCell className="text-right">
                             <Button onClick={() => handleRead("item")}>

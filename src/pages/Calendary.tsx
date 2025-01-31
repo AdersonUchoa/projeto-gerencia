@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Eye, Pencil } from "lucide-react"
 import CalendaryCreate from "@/pages/Calendary/CalendaryCreate"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useState } from "react"
 
 export default function Calendary() {
@@ -27,14 +26,6 @@ export default function Calendary() {
                 <p>Organize sua rotina! Aqui você pode visualizar todos os seus compromissos e criar novas tarefas para manter seu dia sempre em ordem.</p>
             </div>
             <CalendaryCreate />
-            <Dialog open={editModal} onOpenChange={setEditModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Novo compromisso</DialogTitle>
-                    </DialogHeader>
-                    <CalendaryCreate />
-                </DialogContent>
-            </Dialog>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -48,10 +39,10 @@ export default function Calendary() {
                 </TableHeader>
                 <TableBody>
                     <TableRow>
-                        <TableCell className="font-medium">INV001</TableCell>
-                        <TableCell>Paid</TableCell>
-                        <TableCell>Credit Card</TableCell>
-                        <TableCell>$250.00</TableCell>
+                        <TableCell className="font-medium">Agenda</TableCell>
+                        <TableCell>Teste</TableCell>
+                        <TableCell>12/03/2025</TableCell>
+                        <TableCell>19:20</TableCell>
                         <TableCell className="text-right">
                             <Button onClick={() => handleEditCrompromisse("ds")}>
                                 <Pencil />Abrir

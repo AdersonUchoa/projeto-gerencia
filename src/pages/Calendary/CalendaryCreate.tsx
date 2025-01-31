@@ -162,6 +162,71 @@ function CalendaryCompromisse() {
     )
 }
 
+export function CalendaryNotification() {
+    const [notification, setNotification] = React.useState<Array<object>>([])
+
+    const [nome, setNome] = React.useState<string>("")
+    const [description, setDescription] = React.useState<string>("")
+    const [hora, setHora] = React.useState<string>("")
+
+    const handleAddNotification = () => {
+        setNotification([...notification, { nome, description, hora }])
+        setNome("")
+        setDescription("")
+        setHora("")
+    }
+
+    const handleRemoveNotification = (index: number) => {
+        setNotification(notification.filter((_, i) => i !== index))
+    }
+
+    return (
+        <div className="flex flex-col gap-4">
+
+            <div>
+                <Label htmlFor="nome">Nome</Label>
+                <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} />
+            </div>
+            <div>
+                <Label htmlFor="description">Descrição</Label>
+                <Input id="description" value={description} onChange={e => setDescription(e.target.value)} />
+            </div>
+            <div>
+                <Label htmlFor="notification">Hora</Label>
+                <Input type="datetime-local" id="notification" value={hora} onChange={e => setHora(e.target.value)} />
+            </div>
+            <Button onClick={() => handleAddNotification()}>Cadastrar</Button>
+            <div>
+                <Label>Notificações cadastradas</Label>
+                <ScrollArea className="h-40 border-gray-200 border rounded">
+                    <Table>
+                        <TableHeader>
+                            <TableHead>Nome</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Hora</TableHead>
+                            <TableHead>Ação</TableHead>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                notification.map((notification, index) => (
+                                    <TableRow>
+                                        <TableCell>{notification.nome}</TableCell>
+                                        <TableCell>{notification.description}</TableCell>
+                                        <TableCell>{notification.hora}</TableCell>
+                                        <TableCell>
+                                            <Trash2 className="w-5 cursor-pointer" onClick={() => handleRemoveNotification(index)} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+
+                        </TableBody>
+                    </Table>
+                </ScrollArea>
+            </div>
+        </div>
+    )
+}
 
 export default function CalendaryCreate() {
     const categoriasList = [
@@ -209,12 +274,16 @@ export default function CalendaryCreate() {
                             <TabsList className="w-full">
                                 <TabsTrigger value="compromisse" className="w-full">Compromissos</TabsTrigger>
                                 <TabsTrigger value="tasks" className="w-full">Tarefas</TabsTrigger>
+                                <TabsTrigger value="notification" className="w-full">Notificação</TabsTrigger>
                             </TabsList>
                             <TabsContent value="compromisse" >
                                 <CalendaryCompromisse />
                             </TabsContent>
                             <TabsContent value="tasks">
                                 <CalendaryTasks />
+                            </TabsContent>
+                            <TabsContent value="notification">
+                                <CalendaryNotification />
                             </TabsContent>
                         </Tabs>
                         <Button>Cadastrar compromisso</Button>
