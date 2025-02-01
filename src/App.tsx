@@ -3,10 +3,10 @@ import { useContext } from "react"
 import { AuthContext } from "@/Auth"
 
 function App({ children }: { children: React.ReactNode }) {
-  const { isLogged } = useContext(AuthContext)
+  const { logged } = useContext(AuthContext)
   return (
     <>
-      {isLogged() ?
+      {logged ?
         <Layout>
           <div className="flex items-center justify-center w-full p-4">
             {children}

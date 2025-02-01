@@ -9,12 +9,15 @@ import Home from '@/pages/Home.tsx'
 import Calendary from '@/pages/Calendary.tsx'
 import Relatory from '@/pages/Relatory.tsx'
 import Notification from '@/pages/Notification.tsx'
+import { Toaster } from '@/components/ui/toaster.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <Toaster />
         <Routes>
+
           <Route path='/' element={<App children={<Home />} />} />
           <Route path='/agenda' element={<App children={<Calendary />} />} />
           <Route path='/login' element={<Login />} />

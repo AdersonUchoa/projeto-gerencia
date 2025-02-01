@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react"
-import { NavigateFunction, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 
 export const AuthContext = createContext(null)
 
@@ -8,24 +8,33 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const [user, setUser] = useState(null);
     const [logged, setLogged] = useState<boolean>(false);
 
-    const isLogged = () => {
-        const token = localStorage.getItem("token")
-        return token ? true : false
+    function loginToken(token: string) {
+        if (token) {
+            localStorage.setItem("token", token)
+            setLogged(true)
+        }
     }
 
     useEffect(() => {
-        if (!isLogged()) {
-            navigate('/login')
+        const token = localStorage.getItem("token")
+        if (token) {
+            setLogged(true)
+        }
+        if (!logged && !token) {
+            navigate("/login")
         }
     }, [])
+
+    console.log(logged)
 
     const logout = () => {
         localStorage.removeItem("token")
         navigate('/login')
+        setLogged(false)
     }
 
     return (
-        <AuthContext.Provider value={{ isLogged, logout }}>
+        <AuthContext.Provider value={{ logged, logout, loginToken }}>
             {children}
         </AuthContext.Provider>
     )
