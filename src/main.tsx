@@ -17,7 +17,6 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <Toaster />
         <Routes>
-
           <Route path='/' element={<App children={<Home />} />} />
           <Route path='/agenda' element={<App children={<Calendary />} />} />
           <Route path='/login' element={<Login />} />

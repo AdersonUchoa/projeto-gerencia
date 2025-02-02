@@ -9,15 +9,34 @@ import {
 import { Button } from "@/components/ui/button"
 import { Eye, Pencil } from "lucide-react"
 import CalendaryCreate from "@/pages/Calendary/CalendaryCreate"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { GetCompromisso } from "@/requests/Compromisso"
+import { toast } from "@/hooks/use-toast"
 
 export default function Calendary() {
     const [editModal, setEditModal] = useState<boolean>(false)
+    const [compromissos, setCompromissos] = useState([])
 
-    function handleEditCrompromisse(item) {
-        console.log(item)
-        setEditModal(true)
+    async function loadCompromisso() {
+        const data = await GetCompromisso()
+        console.log(data)
     }
+    useEffect(() => {
+        try {
+            loadCompromisso()
+        } catch (error) {
+            toast({
+                title: "Erro ao carregar compromisso",
+                description: "Ocorreu um erro ao carregar compromisso, tente novamente.",
+                variant: "destructive",
+            })
+        }
+    }, [])
+
+    // function handleEditCrompromisse(item) {
+    //         console.log(item)
+    //         setEditModal(true)
+    //     }
 
     return (
         <section className="flex flex-col w-full gap-4">
