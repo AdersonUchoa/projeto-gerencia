@@ -12,6 +12,7 @@ import CalendaryCreate from "@/pages/Calendary/CalendaryCreate"
 import { useEffect, useState } from "react"
 import { GetCompromisso } from "@/requests/Compromisso"
 import { toast } from "@/hooks/use-toast"
+import { Badge } from "@/components/ui/badge"
 
 export default function Calendary() {
     const [editModal, setEditModal] = useState<boolean>(false)
@@ -19,7 +20,7 @@ export default function Calendary() {
 
     async function loadCompromisso() {
         const data = await GetCompromisso()
-        console.log(data)
+        setCompromissos(data.data.response)
     }
     useEffect(() => {
         try {
@@ -33,10 +34,6 @@ export default function Calendary() {
         }
     }, [])
 
-    // function handleEditCrompromisse(item) {
-    //         console.log(item)
-    //         setEditModal(true)
-    //     }
 
     return (
         <section className="flex flex-col w-full gap-4">
@@ -57,17 +54,23 @@ export default function Calendary() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow>
-                        <TableCell className="font-medium">Agenda</TableCell>
-                        <TableCell>Teste</TableCell>
-                        <TableCell>12/03/2025</TableCell>
-                        <TableCell>19:20</TableCell>
-                        <TableCell className="text-right">
-                            <Button onClick={() => handleEditCrompromisse("ds")}>
-                                <Pencil />Abrir
-                            </Button>
-                        </TableCell>
-                    </TableRow>
+                    {
+                        compromissos.map((item, index) =>
+                            <TableRow>
+                                <TableCell className="font-medium">{item.titulo}</TableCell>
+                                <TableCell className="max-w-10 text-nowrap overflow-hidden text-ellipsis">{item.descricao}</TableCell>
+                                <TableCell>{item.datacompromisso}</TableCell>
+                                <TableCell>{item.horario}</TableCell>
+                                <TableCell>{item.classificacao.map(classificacao => <Badge>{classificacao}</Badge>)}</TableCell>
+                                <TableCell className="text-right">
+                                    <Button onClick={() => handleEditCrompromisse("ds")}>
+                                        <Pencil />Abrir
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        )
+                    }
+
                 </TableBody>
             </Table>
         </section>

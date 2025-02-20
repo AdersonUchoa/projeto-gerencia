@@ -25,8 +25,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         }
     }, [])
 
-    console.log(logged)
-
     const logout = () => {
         localStorage.removeItem("token")
         navigate('/login')

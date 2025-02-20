@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { useEffect } from "react"
+import { GetRelatorio } from "@/requests/Relatorio"
 
 
 function CardRelatory({ title, value }: { title: string, value: number }) {
@@ -44,6 +46,14 @@ export default function Relatory() {
             color: "#ff0000"
         }
     } satisfies ChartConfig
+
+    useEffect(() => {
+        const initialLoad = async () => {
+            await GetRelatorio({ dtInicio: "2025/01/01", dtFim: "2025/09/01" })
+        }
+
+        initialLoad()
+    }, [])
 
     return (
         <section className="flex flex-col w-full gap-4">

@@ -26,6 +26,10 @@ import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { taskStatus } from "@/data/enum"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trash2 } from "lucide-react"
+import { PostCompromisso } from "@/requests/Compromisso"
+import { toast } from "@/hooks/use-toast"
+import { GetClassificacao } from "@/requests/Classificacao"
+import { PostTarefa } from "@/requests/Tarefa"
 
 const CalendaryCreateContext = React.createContext(null)
 
@@ -42,7 +46,6 @@ function CalendaryTasks() {
         setTasks([...tasks, { descricao: description, status: status }])
     }
 
-    console.log(tasks)
 
     return (
         <div className="flex flex-col gap-4">
@@ -142,7 +145,7 @@ function CalendaryCompromisse() {
             </div>
             <div>
                 <Label htmlFor="descricao">Descrição</Label>
-                <Textarea id="descricao" onChange={e => setDescricao(e.target.value)} value={descricao} />
+                <Textarea id="descricao" maxLength={255} onChange={e => setDescricao(e.target.value)} value={descricao} />
             </div>
             <div className="flex w-full gap-4">
                 <div className="w-full">
@@ -229,19 +232,37 @@ export function CalendaryNotification() {
 }
 
 export default function CalendaryCreate() {
-    const categoriasList = [
-        { id: "1", name: "Status Bar", checked: true },
-        { id: "2", name: "Activity Bar", checked: false },
-        { id: "3", name: "Panel", checked: false },
-    ];
-
 
     const [nome, setNome] = React.useState<string>("")
     const [descricao, setDescricao] = React.useState<string>("")
     const [data, setData] = React.useState<string>("")
     const [hora, setHora] = React.useState<string>("")
-    const [categorias, setCategorias] = React.useState<object[]>(categoriasList)
+    const [categorias, setCategorias] = React.useState<object[]>()
     const [tasks, setTasks] = React.useState<object[]>([])
+
+    React.useEffect(() => {
+        async function initialLoad() {
+            const request = await GetClassificacao()
+            setCategorias(request.data.response.map(item => ({ id: item.id, name: item.titulo, checked: false })))
+        }
+        initialLoad()
+    }, [])
+
+    const handleAddCompromisso = async () => {
+        try {
+            const responseCompromisso = await PostCompromisso({ titulo: nome, descricao: descricao, dataCompromisso: data, horario: hora, classificacao: categorias.map((categoria: any) => categoria.id) })
+            const idCompromisso = responseCompromisso.data.response.id
+            for (const task of tasks) {
+                await PostTarefa({ idCompromisso: responseCompromisso.data.response.id, descricao: task.descricao, status: task.status })
+            }
+        } catch (error) {
+            toast({
+                title: "Erro ao cadastrar compromisso",
+                description: "Ocorreu um erro ao cadastrar compromisso, tente novamente.",
+                variant: "destructive",
+            })
+        }
+    }
 
     return (
         <CalendaryCreateContext.Provider value={{
@@ -286,7 +307,7 @@ export default function CalendaryCreate() {
                                 <CalendaryNotification />
                             </TabsContent>
                         </Tabs>
-                        <Button>Cadastrar compromisso</Button>
+                        <Button onClick={() => handleAddCompromisso()}>Cadastrar compromisso</Button>
                     </DialogContent>
                 </Dialog>
             </div>
