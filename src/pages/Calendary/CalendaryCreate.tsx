@@ -26,7 +26,7 @@ import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { taskStatus } from "@/data/enum"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Trash2 } from "lucide-react"
-import { PostCompromisso } from "@/requests/Compromisso"
+import { PostCompromisso, PostCompromissoAll } from "@/requests/Compromisso"
 import { toast } from "@/hooks/use-toast"
 import { GetClassificacao } from "@/requests/Classificacao"
 import { PostTarefa } from "@/requests/Tarefa"
@@ -44,6 +44,8 @@ function CalendaryTasks() {
 
     const handleAddTasks = () => {
         setTasks([...tasks, { descricao: description, status: status }])
+        setDescription("")
+        setStatus(0)
     }
 
 
@@ -51,7 +53,7 @@ function CalendaryTasks() {
         <div className="flex flex-col gap-4">
             <div>
                 <Label htmlFor="taskDescription">Descrição</Label>
-                <Input id="taskDescription" onChange={e => setDescription(e.target.value)} />
+                <Input id="taskDescription" value={description} onChange={e => setDescription(e.target.value)} />
             </div>
             <div>
                 <Label htmlFor="taskStatus">Status</Label>
@@ -166,15 +168,15 @@ function CalendaryCompromisse() {
 }
 
 export function CalendaryNotification() {
-    const [notification, setNotification] = React.useState<Array<object>>([])
+    const { notification, setNotification } = React.useContext(CalendaryCreateContext)
 
-    const [nome, setNome] = React.useState<string>("")
+    const [titulo, setTitulo] = React.useState<string>("")
     const [description, setDescription] = React.useState<string>("")
     const [hora, setHora] = React.useState<string>("")
 
     const handleAddNotification = () => {
-        setNotification([...notification, { nome, description, hora }])
-        setNome("")
+        setNotification([...notification, { titulo, description, hora }])
+        setTitulo("")
         setDescription("")
         setHora("")
     }
@@ -188,7 +190,7 @@ export function CalendaryNotification() {
 
             <div>
                 <Label htmlFor="nome">Nome</Label>
-                <Input id="nome" value={nome} onChange={e => setNome(e.target.value)} />
+                <Input id="nome" value={titulo} onChange={e => setTitulo(e.target.value)} />
             </div>
             <div>
                 <Label htmlFor="description">Descrição</Label>
@@ -211,9 +213,9 @@ export function CalendaryNotification() {
                         </TableHeader>
                         <TableBody>
                             {
-                                notification.map((notification, index) => (
+                                notification?.map((notification, index) => (
                                     <TableRow>
-                                        <TableCell>{notification.nome}</TableCell>
+                                        <TableCell>{notification.titulo}</TableCell>
                                         <TableCell>{notification.description}</TableCell>
                                         <TableCell>{notification.hora}</TableCell>
                                         <TableCell>
@@ -237,8 +239,10 @@ export default function CalendaryCreate() {
     const [descricao, setDescricao] = React.useState<string>("")
     const [data, setData] = React.useState<string>("")
     const [hora, setHora] = React.useState<string>("")
-    const [categorias, setCategorias] = React.useState<object[]>()
+    const [categorias, setCategorias] = React.useState<object[]>([])
     const [tasks, setTasks] = React.useState<object[]>([])
+    const [notification, setNotification] = React.useState<object[]>([])
+    const [open, setOpen] = React.useState<boolean>(false)
 
     React.useEffect(() => {
         async function initialLoad() {
@@ -250,12 +254,25 @@ export default function CalendaryCreate() {
 
     const handleAddCompromisso = async () => {
         try {
-            const responseCompromisso = await PostCompromisso({ titulo: nome, descricao: descricao, dataCompromisso: data, horario: hora, classificacao: categorias.map((categoria: any) => categoria.id) })
-            const idCompromisso = responseCompromisso.data.response.id
-            for (const task of tasks) {
-                await PostTarefa({ idCompromisso: responseCompromisso.data.response.id, descricao: task.descricao, status: task.status })
-            }
+            await PostCompromissoAll({
+                titulo: nome,
+                descricao: descricao,
+                dataCompromisso: data,
+                horario: hora,
+                classificao: categorias.map((categoria: any) => categoria.id) ?? [],
+                tasks: tasks.map((task: any) => ({ descricao: task.descricao, status: task.status })) ?? [],
+                notification: notification.map((notification: any) => ({ titulo: notification.titulo, descricao: notification.description, hora: notification.hora })) ?? []
+            })
+            setOpen(false)
+            setNome("")
+            setDescricao("")
+            setData("")
+            setHora("")
+            setCategorias([])
+            setTasks([])
+            setNotification([])
         } catch (error) {
+            console.log(error)
             toast({
                 title: "Erro ao cadastrar compromisso",
                 description: "Ocorreu um erro ao cadastrar compromisso, tente novamente.",
@@ -277,10 +294,12 @@ export default function CalendaryCreate() {
             hora,
             setHora,
             categorias,
-            setCategorias
+            setCategorias,
+            notification,
+            setNotification
         }}>
             <div>
-                <Dialog>
+                <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger>
                         <Button>Cadastrar</Button>
                     </DialogTrigger>

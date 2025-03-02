@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { GetRelatorio } from "@/requests/Relatorio"
+import moment from "moment"
+import { toast } from "@/hooks/use-toast"
 
 
 function CardRelatory({ title, value }: { title: string, value: number }) {
@@ -23,10 +25,11 @@ function CardRelatory({ title, value }: { title: string, value: number }) {
 }
 
 export default function Relatory() {
-    const chartData = [
-        { month: "January", andamento: 400, pendente: 186, concluido: 80, cancelado: 20 },
 
-    ]
+    const [chartInfo, setChartInfo] = useState([])
+    const [dtInicio, setDtInicio] = useState(moment().subtract(1, "month").format("yyyy/MM/DD"))
+    const [dtFim, setDtFim] = useState(moment().format("yyyy/MM/DD"))
+    const [open, setOpen] = useState(false)
 
     const chartConfig = {
         andamento: {
@@ -47,11 +50,29 @@ export default function Relatory() {
         }
     } satisfies ChartConfig
 
-    useEffect(() => {
-        const initialLoad = async () => {
-            await GetRelatorio({ dtInicio: "2025/01/01", dtFim: "2025/09/01" })
-        }
 
+    const initialLoad = async () => {
+        try {
+            const { data: dataRelatorio } = await GetRelatorio({ dtInicio: dtInicio, dtFim: dtFim })
+
+            const response = dataRelatorio.response
+
+            console.log(response)
+
+            const chartData = [
+                { month: `${dtInicio} - ${dtFim}`, andamento: response.andamento[0].count, pendente: response.pendente[0].count, concluido: response.concluido[0].count, cancelado: response.cancelado[0].count },
+            ]
+            setChartInfo(chartData)
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um erro ao carregar os dados, tente novamente.",
+                variant: "destructive",
+            })
+        }
+    }
+
+    useEffect(() => {
         initialLoad()
     }, [])
 
@@ -62,8 +83,8 @@ export default function Relatory() {
                 <p>Monte relatórios para ter uma melhor visualização dos seus compromissos.</p>
             </div>
             <div>
-                <Popover>
-                    <PopoverTrigger>
+                <Popover open={open}>
+                    <PopoverTrigger onClick={() => setOpen(true)}>
                         <Button>Filtrar</Button>
                     </PopoverTrigger>
                     <PopoverContent>
@@ -71,13 +92,16 @@ export default function Relatory() {
 
                             <div>
                                 <Label>Mês inicio</Label>
-                                <Input type="date" />
+                                <Input onChange={e => setDtInicio(e.target.value)} type="date" />
                             </div>
                             <div>
                                 <Label>Mês fim</Label>
-                                <Input type="date" />
+                                <Input onChange={e => setDtFim(e.target.value)} type="date" />
                             </div>
-                            <Button>Definir filtro</Button>
+                            <Button onClick={async () => {
+                                await initialLoad()
+                                setOpen(false)
+                            }}>Definir filtro</Button>
                         </div>
                     </PopoverContent>
                 </Popover>
@@ -85,15 +109,15 @@ export default function Relatory() {
             <div className="flex flex-col items-center gap-4">
                 <span>Dados referente a todo o periodo selecionado</span>
                 <div className="flex gap-4">
-                    <CardRelatory title="Total de compromissos em andamento" value={100} />
-                    <CardRelatory title="Total de compromissos pendentes" value={20} />
-                    <CardRelatory title="Total de compromissos cancelados" value={20} />
-                    <CardRelatory title="Total de compromissos concluídos" value={80} />
+                    <CardRelatory title="Total de compromissos em andamento" value={chartInfo[0]?.andamento ?? 0} />
+                    <CardRelatory title="Total de compromissos pendentes" value={chartInfo[0]?.pendente ?? 0} />
+                    <CardRelatory title="Total de compromissos cancelados" value={chartInfo[0]?.cancelados ?? 0} />
+                    <CardRelatory title="Total de compromissos concluídos" value={chartInfo[0]?.concluidos ?? 0} />
                 </div>
             </div>
             <div>
                 <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                    <BarChart accessibilityLayer data={chartData}>
+                    <BarChart accessibilityLayer data={chartInfo}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="month"
@@ -114,4 +138,3 @@ export default function Relatory() {
         </section>
     )
 }
-

@@ -1,1 +1,1 @@
-export const API_URL: string = "https://8493-2804-5dc-301-fc00-d51-e30f-ca36-a160.ngrok-free.app/";
+export const API_URL: string = "http://localhost:3000";

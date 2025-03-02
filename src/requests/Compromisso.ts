@@ -1,7 +1,7 @@
 import http from "./Base";
 
 export const GetCompromisso = async () => {
-    return http.get("/compromisso")
+	return http.get("/compromisso")
 };
 
 export const PostCompromisso = async ({
@@ -12,6 +12,26 @@ export const PostCompromisso = async ({
 	classificacao
 }: { titulo: string, descricao: string, dataCompromisso: string, horario: string, classificacao: number[] }) => {
 	return http.post("/compromisso", { titulo, descricao, dataCompromisso, horario, classificacao })
+}
+
+export const PostCompromissoAll = async ({
+	titulo,
+	descricao,
+	dataCompromisso,
+	horario,
+	classificao,
+	tasks,
+	notification,
+}) => {
+	return http.post("/compromissoAll", {
+		titulo,
+		descricao,
+		dataCompromisso,
+		horario,
+		classificao,
+		tasks,
+		notification
+	})
 }
 
 export const PutCompromisso = async ({

@@ -12,36 +12,66 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import React from "react";
-
-function NotificationReadAll() {
-    return (
-        <AlertDialog>
-            <AlertDialogTrigger>
-                <Button><Eye /> Marcar todas como lidas</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Essa ação irá marcar todas as notificação como lidas.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction>Continuar</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    )
-}
+import React, { useEffect } from "react";
+import { GetNotificacaoAll, PostRead, PostReadAll } from "@/requests/Notificacao";
+import moment from "moment";
+import { toast } from "@/hooks/use-toast";
 
 export default function Notification() {
 
+    const [notificacao, setNotificacao] = React.useState([])
     const [readModal, setReadModal] = React.useState<boolean>(false)
     const [readNotification, setReadNotification] = React.useState<boolean>(false)
+    const [readItem, setReadItem] = React.useState<object>({})
+
+    async function initialLoad() {
+        try {
+            const { data: response } = await GetNotificacaoAll()
+            setNotificacao(response.response)
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um erro ao carregar os dados, tente novamente.",
+                variant: "destructive",
+            })
+        }
+
+    }
+
+    useEffect(() => {
+        initialLoad()
+    }, [])
     function handleRead(item) {
+        setReadItem(item)
         setReadModal(true)
+    }
+
+    async function handleReadAll() {
+        try {
+            await PostReadAll()
+            await initialLoad()
+            setReadNotification(false)
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um erro ao marcar todas as notificação como lidas, tente novamente.",
+                variant: "destructive",
+            })
+        }
+    }
+
+    async function handleReadNotification() {
+        try {
+            await PostRead({ id: readItem.idnotificacao })
+            await initialLoad()
+            setReadNotification(false)
+        } catch (error) {
+            toast({
+                title: "Erro",
+                description: "Ocorreu um erro ao marcar essa notificação como lida, tente novamente.",
+                variant: "destructive",
+            })
+        }
     }
 
     return (
@@ -51,7 +81,23 @@ export default function Notification() {
                 <p>Veja todas as notificação</p>
             </div>
             <div>
-                <NotificationReadAll />
+                <AlertDialog>
+                    <AlertDialogTrigger>
+                        <Button><Eye /> Marcar todas como lidas</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Essa ação irá marcar todas as notificação como lidas.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleReadAll()}>Continuar</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
             <AlertDialog open={readModal} onOpenChange={setReadModal}>
                 <AlertDialogContent>
@@ -63,12 +109,16 @@ export default function Notification() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction>Continuar</AlertDialogAction>
+
+                        <AlertDialogAction onClick={() => handleReadNotification()}>
+                            Continuar
+                        </AlertDialogAction>
+
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
             <Table>
-                <TableCaption>Lista de compromissos</TableCaption>
+                <TableCaption>Lista de notificações</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[100px]">Nome</TableHead>
@@ -79,17 +129,22 @@ export default function Notification() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow>
-                        <TableCell className="font-medium">Pagamento fatura</TableCell>
-                        <TableCell>Pagar fatura do cartão</TableCell>
-                        <TableCell>27/01/2025 12:50</TableCell>
-                        <TableCell>Lida</TableCell>
-                        <TableCell className="text-right">
-                            <Button onClick={() => handleRead("item")}>
-                                <Eye /> Marcar como lida
-                            </Button>
-                        </TableCell>
-                    </TableRow>
+                    {notificacao?.map((item) => (
+                        <TableRow>
+                            <TableCell className="font-medium">{item.titulo}</TableCell>
+                            <TableCell>{item.descricao}</TableCell>
+                            <TableCell>{moment(item.data).format("DD/MM/yyyy HH:mm")}</TableCell>
+                            <TableCell>{item.visualizado ? "Lida" : "Não lida"}</TableCell>
+                            <TableCell className="text-right">
+                                {!item.visualizado &&
+                                    <Button onClick={() => handleRead(item)}>
+                                        <Eye /> Marcar como lida
+                                    </Button>
+                                }
+                            </TableCell>
+                        </TableRow>
+                    ))}
+
                 </TableBody>
             </Table>
         </section>
