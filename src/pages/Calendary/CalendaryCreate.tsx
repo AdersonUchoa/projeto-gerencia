@@ -30,6 +30,7 @@ import { PostCompromisso, PostCompromissoAll } from "@/requests/Compromisso"
 import { toast } from "@/hooks/use-toast"
 import { GetClassificacao } from "@/requests/Classificacao"
 import { PostTarefa } from "@/requests/Tarefa"
+import moment from "moment"
 
 const CalendaryCreateContext = React.createContext(null)
 
@@ -217,7 +218,7 @@ export function CalendaryNotification() {
                                     <TableRow>
                                         <TableCell>{notification.titulo}</TableCell>
                                         <TableCell>{notification.description}</TableCell>
-                                        <TableCell>{notification.hora}</TableCell>
+                                        <TableCell>{moment(notification.hora).format("DD/MM/yyyy HH:mm")}</TableCell>
                                         <TableCell>
                                             <Trash2 className="w-5 cursor-pointer" onClick={() => handleRemoveNotification(index)} />
                                         </TableCell>

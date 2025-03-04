@@ -38,16 +38,17 @@ export const PutCompromisso = async ({
 	id,
 	titulo,
 	descricao,
-	dataCompromisso,
+	datacompromisso,
 	horario
+
 }: {
 	id: number;
 	titulo: string;
 	descricao: string;
-	dataCompromisso: string;
+	datacompromisso: string;
 	horario: string;
 }) => {
-	return http.put(`/compromisso/${id}`, { titulo, descricao, dataCompromisso, horario })
+	return http.put(`/compromisso/${id}`, { titulo, descricao, datacompromisso, horario })
 }
 
 export const DeleteCompromisso = async (id: number) => {

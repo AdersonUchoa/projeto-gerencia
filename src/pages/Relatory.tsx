@@ -111,8 +111,8 @@ export default function Relatory() {
                 <div className="flex gap-4">
                     <CardRelatory title="Total de compromissos em andamento" value={chartInfo[0]?.andamento ?? 0} />
                     <CardRelatory title="Total de compromissos pendentes" value={chartInfo[0]?.pendente ?? 0} />
-                    <CardRelatory title="Total de compromissos cancelados" value={chartInfo[0]?.cancelados ?? 0} />
-                    <CardRelatory title="Total de compromissos concluídos" value={chartInfo[0]?.concluidos ?? 0} />
+                    <CardRelatory title="Total de compromissos cancelados" value={chartInfo[0]?.cancelado ?? 0} />
+                    <CardRelatory title="Total de compromissos concluídos" value={chartInfo[0]?.concluido ?? 0} />
                 </div>
             </div>
             <div>
