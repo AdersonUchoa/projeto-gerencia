@@ -4,6 +4,10 @@ export const GetCompromisso = async () => {
 	return http.get("/compromisso")
 };
 
+export const GetCompromissoId = async ({ id }: { id: number }) => {
+	return http.get(`/compromisso/${id}`)
+}
+
 export const PostCompromisso = async ({
 	titulo,
 	descricao,

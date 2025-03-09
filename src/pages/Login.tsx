@@ -20,6 +20,7 @@ export default function Login() {
     const navigate = useNavigate()
     const [nome, setNome] = useState<string>("")
     const [senha, setSenha] = useState<string>("")
+    const [email, setEmail] = useState<string>("")
 
     const [register, setRegister] = useState<boolean>(false);
 
@@ -49,7 +50,7 @@ export default function Login() {
 
     const handleRegisterUser = async () => {
         try {
-            await PostRegister({ nome: nome, senha: senha })
+            await PostRegister({ nome: nome, senha: senha, email: email })
             const requestLogin = await PostLogin({ nome: nome, senha: senha })
             loginToken(requestLogin.data.response)
             toast({
@@ -81,6 +82,12 @@ export default function Login() {
                     <Label htmlFor="usuario">Usuário</Label>
                     <Input placeholder="Digite seu usuário" id="usuario" value={nome} onChange={e => setNome(e.target.value)} />
                 </CardContent>
+                {register &&
+                    <CardContent>
+                        <Label htmlFor="email">Email</Label>
+                        <Input placeholder="Digite seu email" id="email" value={email} onChange={e => setEmail(e.target.value)} />
+                    </CardContent>
+                }
                 <CardContent>
                     <Label htmlFor="senha">Senha</Label>
                     <Input placeholder="Digite sua senha" id="senha" value={senha} onChange={e => setSenha(e.target.value)} />
